@@ -1,0 +1,58 @@
+# this workflow deploys and pulls the data daily at 12 am in central Europe
+# dispatch this manually if some very important data is changed
+
+name: Daily data update and deploy
+on:
+  schedule:
+    - cron: '0 22 * 3-10 *' # CEST
+    - cron: '0 23 * 11-2 *' # CET
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install scripts dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run data getter
+        run: python scripts/get_data.py
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install site dependencies
+        run: npm ci
+
+      - name: Build site
+        run: npm run build
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        uses: actions/deploy-pages@v4
+        id: deployment
