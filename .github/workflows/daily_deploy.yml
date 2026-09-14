@@ -4,8 +4,9 @@
 name: Daily data update and deploy
 on:
   schedule:
-    - cron: '0 22 * 3-10 *' # CEST
-    - cron: '0 23 * 11-2 *' # CET
+    - cron: '0 22 * 3-10 *'  # CEST
+    - cron: '0 23 * 11,12 *' # CET November-December
+    - cron: '0 23 * 1,2 *'   # CET January-February
   workflow_dispatch:
 
 permissions:
