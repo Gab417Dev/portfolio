@@ -30,6 +30,9 @@ jobs:
 
       - name: Run data getter
         run: python scripts/get_data.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WAKATIME_API_KEY: ${{ secrets.WAKATIME_API_KEY }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
